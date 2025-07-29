@@ -4,10 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";  # Pin a stable Nixpkgs version
     aiken.url = "github:aiken-lang/aiken";  # Aiken input
-    mesh = {
-      url = "github:MeshJS/mesh";  # MeshSDK for Cardano JS integration
-      flake = false;  # Treat as non-flake to avoid missing flake.nix error
-    };
+    mesh.url = "github:MeshJS/mesh";  # MeshSDK source (no flake.nix)
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -15,19 +12,33 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
+        # Custom derivation for MeshSDK (since it lacks default.nix)
+        meshSdk = pkgs.stdenv.mkDerivation {
+          pname = "mesh-sdk";
+          version = "unstable";  # Or pin a commit/version
+          src = mesh;
+          nativeBuildInputs = [ pkgs.nodejs pkgs.bun ];  # For JS build
+          buildPhase = ''
+            bun install  # Or npm install if preferred
+          '';
+          installPhase = ''
+            mkdir -p $out
+            cp -r . $out
+          '';
+        };
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = [
             aiken.packages.${system}.aiken  # Aiken CLI
-            pkgs.bun  # JS runtime, as in your example
-            pkgs.age  # For secret management (e.g., Blockfrost key)
-            (pkgs.callPackage mesh {})  # MeshSDK (adjust if needed; or use pkgs.nodePackages."@meshsdk/core" if available in Nixpkgs)
-            pkgs.python3Full  # Python 3.x for node-gyp and build tools
-            pkgs.nodePackages.node-gyp  # Explicit node-gyp for native module builds
+            pkgs.bun  # JS runtime
+            pkgs.age  # For secret management
+            meshSdk  # Use the custom derivation
+            pkgs.python3Full  # Python for builds
+            pkgs.nodePackages.node-gyp  # For native modules
           ];
           shellHook = ''
             echo "Aiken + Nix dev environment ready for Cardano development!"
-            # Optional: Add commands like 'bun install --ignore-scripts' if Bun rebuilds fail
+            # Optional: bun install --ignore-scripts for any JS deps
           '';
         };
       });
