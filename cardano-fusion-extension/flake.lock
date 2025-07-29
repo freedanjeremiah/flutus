@@ -56,6 +56,22 @@
         "type": "github"
       }
     },
+    "mesh": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1753697953,
+        "narHash": "sha256-a7o5rDaILeiO1xDbKgM9t412krnpR/ur56XHXnlSZk0=",
+        "owner": "MeshJS",
+        "repo": "mesh",
+        "rev": "27cbc5548a2528e6ec96bb0d0c0a9ffedc846220",
+        "type": "github"
+      },
+      "original": {
+        "owner": "MeshJS",
+        "repo": "mesh",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1751984180,
@@ -108,6 +124,7 @@
       "inputs": {
         "aiken": "aiken",
         "flake-utils": "flake-utils_2",
+        "mesh": "mesh",
         "nixpkgs": "nixpkgs_3"
       }
     },
