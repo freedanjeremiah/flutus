@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Cardano Deploy</title>
+</head>
+<body>
+  <button id="deployButton">Run Deployment</button>  <!-- Changed to ID for event listener -->
+  <script type="module">
+    // Import the function (change to './deploy.ts' if your file is .ts)
+    import { deployContract } from './deploy.js';
+
+    // Expose to global window
+    window.deployContract = deployContract;
+
+    // Add event listener to button (avoids timing issues)
+    document.getElementById('deployButton').addEventListener('click', () => {
+      deployContract().catch(console.error);
+    });
+  </script>
+</body>
+</html>
