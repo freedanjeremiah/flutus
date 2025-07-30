@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cardano Deployment Test</title>
+</head>
+<body>
+  <button onclick="deployContract()">Deploy Contract</button>
+  <script type="module">
+    import { Lucid, Blockfrost, Data, Constr } from "https://unpkg.com/lucid-cardano@latest?module";
+    import * as CML from "https://unpkg.com/@dcspark/cardano-multiplatform-lib-browser@latest?module"; // Using dcspark for compatibility
+
+    const BLOCKFROST_URL = "https://cardano-preprod.blockfrost.io/api/v0";
+    const BLOCKFROST_KEY = "preprodmD7cnzGbJ1BUPxqZqOPSYGCZm13tggaq";
+    const PLUTUS_JSON_PATH = "./plutus.json"; // Adjust if needed
+
+    async function deployContract() {
+      try {
+        const provider = new Blockfrost(BLOCKFROST_URL, BLOCKFROST_KEY);
+        const lucid = await Lucid.new(provider, "Preprod");
+
+        // Wait for Eternl
+        let api;
+        for (let attempts = 0; attempts < 10; attempts++) {
+          if (window.cardano && window.cardano.eternl) {
+            api = await window.cardano.eternl.enable();
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        if (!api) throw new Error("Eternl not detected.");
+        lucid.selectWallet(api, { CML }); // Explicit CML pass
+
+        if (!lucid.txBuilderConfig) throw new Error("txBuilderConfig undefined.");
+
+        // Load blueprint (fetch if dynamic import fails)
+        const response = await fetch(PLUTUS_JSON_PATH);
+        const blueprint = await response.json();
+        const validator = blueprint.validators[0];
+        const script = { type: "PlutusV2", script: validator.compiledCode };
+        const scriptAddress = lucid.utils.validatorToAddress(script);
+
+        // Datum with dynamic owner hash
+        const address = await lucid.wallet.address();
+        const paymentCred = CML.Address.from_bech32(address).payment_cred();
+        const ownerHash = paymentCred.to_keyhash()?.to_hex() || "";
+        if (!ownerHash) throw new Error("Failed to derive owner hash.");
+        const datum = Data.to(new Constr(0, [Data.bytes(ownerHash)]));
+
+        // Build, sign, submit tx
+        const tx = await lucid.newTx()
+          .payToContract(scriptAddress, { inline: datum }, { lovelace: 5000000n })
+          .complete();
+        const signedTx = await tx.sign().complete();
+        const txHash = await signedTx.submit();
+
+        console.log(`Success! Tx Hash: ${txHash}`);
+        console.log(`Script Address: ${scriptAddress}`);
+      } catch (error) {
+        console.error("Deployment error:", error.message, error.stack);
+      }
+    }
+  </script>
+</body>
+</html>

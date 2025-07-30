@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
+import wasm from 'vite-plugin-wasm';  // For WASM ESM support
 
 export default defineConfig({
-  plugins: [legacy({ targets: ['defaults'] })],
+  plugins: [
+    legacy({ targets: ['defaults'] }),
+    wasm()  // Handles WASM loading
+  ],
   resolve: {
     alias: {
       'assert': 'assert',
@@ -14,13 +18,18 @@ export default defineConfig({
       'stream': 'stream-browserify',
       'url': 'url',
       'zlib': 'browserify-zlib',
-      'data:text/javascript,export default class Module {}': './empty-module.js'  // Absolute path to avoid warning
+      'data:text/javascript,export default class Module {}': './empty-module.js'
     }
   },
   optimizeDeps: {
-    esbuildOptions: { target: 'es2022' }  // Updated to support top-level await
+    include: ['@emurgo/cardano-serialization-lib-browser'],  // Pre-bundle serialization lib
+    esbuildOptions: { target: 'es2022' }  // For top-level await
+  },
+  worker: {
+    format: 'es'
   },
   server: {
-    open: true  // Auto-open browser
+    open: true,
+    hmr: { overlay: false }  // Hide overlays during testing
   }
 });
