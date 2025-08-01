@@ -1,0 +1,5 @@
+{
+  "type": "PlutusScriptV2",
+  "description": "HTLC (Hash Time Lock Contract)",
+  "cborHex": "placeholder"
+}

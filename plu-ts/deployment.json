@@ -1,0 +1,12 @@
+{
+  "contractName": "HTLC",
+  "scriptHash": "fa2f083c8dd5039fc3db0e1dabc13ebc24b50d2de5bcd5bbf6aaa89e",
+  "scriptAddress": "addr_test1wraz7zpu3h2s887rmv8pm27p867zfdgd9hjme4dm764238szmx8gz",
+  "scriptCbor": "4b4a01010098004928d20541",
+  "scriptSizeBytes": 12,
+  "network": "testnet",
+  "deployedAt": "2025-08-01T17:34:16.739Z",
+  "version": "1.0.0",
+  "blockfrostConnected": true,
+  "protocolParamsRetrieved": true
+}

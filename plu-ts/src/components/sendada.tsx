@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useWallet } from '@meshsdk/react';
 import { BlockfrostProvider, Transaction } from '@meshsdk/core';
+import ENV from '../config/env';
 
 const SendAdaTestPreprod: React.FC = () => {
   const { wallet, connected } = useWallet();
@@ -22,7 +23,7 @@ const SendAdaTestPreprod: React.FC = () => {
 
     try {
       // Initialize Blockfrost provider with your project ID - this might not be needed if wallet handles it internally
-      const blockfrost = new BlockfrostProvider('preprodmD7cnzGbJ1BUPxqZqOPSYGCZm13tggaq', 0);
+      const blockfrost = new BlockfrostProvider(ENV.BLOCKFROST_PROJECT_ID, 0);
 
       // Create transaction with only the initiator wallet
       const tx = new Transaction({ initiator: wallet });

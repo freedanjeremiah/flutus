@@ -6,14 +6,18 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build", 
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@harmoniclabs/blockfrost-pluts": "^0.3.0",
     "@harmoniclabs/plu-ts": "^0.9.0",
+    "@harmoniclabs/uint8array-utils": "^1.0.4",
     "@meshsdk/core": "^1.9.0-beta.0",
     "@meshsdk/react": "^1.9.0-beta.0",
+    "bip39": "^3.1.0",
+    "dotenv": "^17.2.1",
     "next": "15.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -26,6 +30,7 @@
     "eslint-config-next": "15.0.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
