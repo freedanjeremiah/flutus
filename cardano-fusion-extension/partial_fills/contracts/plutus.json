@@ -1,0 +1,113 @@
+{
+  "preamble": {
+    "title": "cf/trees",
+    "description": "Enhanced Merkle Tree for Partial Order Fills using Keccac-256 hashing.",
+    "version": "0.0.2",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.19+e525483"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [],
+  "definitions": {
+    "Order": {
+      "title": "Order",
+      "dataType": "constructor",
+      "fields": [
+        {
+          "title": "order_id",
+          "description": "Unique order identifier",
+          "$ref": "#/definitions/ByteArray"
+        },
+        {
+          "title": "maker",
+          "description": "Order maker address",
+          "$ref": "#/definitions/ByteArray"
+        },
+        {
+          "title": "maker_asset",
+          "description": "Asset being sold",
+          "$ref": "#/definitions/ByteArray"
+        },
+        {
+          "title": "taker_asset",
+          "description": "Asset being bought",
+          "$ref": "#/definitions/ByteArray"
+        },
+        {
+          "title": "maker_amount",
+          "description": "Total amount to sell",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "taker_amount",
+          "description": "Total amount to buy",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "filled_amount",
+          "description": "Amount already filled",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "min_fill_amount",
+          "description": "Minimum fill size",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "expiry",
+          "description": "Order expiration time",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "salt",
+          "description": "Random salt for uniqueness",
+          "$ref": "#/definitions/ByteArray"
+        }
+      ]
+    },
+    "Fill": {
+      "title": "Fill",
+      "dataType": "constructor",
+      "fields": [
+        {
+          "title": "order_id",
+          "description": "Reference to original order",
+          "$ref": "#/definitions/ByteArray"
+        },
+        {
+          "title": "fill_id",
+          "description": "Unique fill identifier",
+          "$ref": "#/definitions/ByteArray"
+        },
+        {
+          "title": "taker",
+          "description": "Who executed the fill",
+          "$ref": "#/definitions/ByteArray"
+        },
+        {
+          "title": "filled_maker_amount",
+          "description": "Amount of maker asset filled",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "filled_taker_amount",
+          "description": "Amount of taker asset filled",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "timestamp",
+          "description": "When fill was executed",
+          "$ref": "#/definitions/Int"
+        },
+        {
+          "title": "partial",
+          "description": "Whether this is a partial fill",
+          "$ref": "#/definitions/Bool"
+        }
+      ]
+    }
+  }
+}
