@@ -5,6 +5,11 @@ This project provides a framework for implementing Hash Time Lock Contracts (HTL
 ## Table of Contents
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
+- [Cardano Fusion Extension](#cardano-fusion-extension)
+  - [Aiken Validators (.ak files)](#aiken-validators-ak-files)
+  - [Partial Fills Implementation](#partial-fills-implementation)
+  - [HTLC Cross-Chain Implementation](#htlc-cross-chain-implementation)
+  - [Lines of Code Statistics](#lines-of-code-statistics)
 - [Cardano (Non-EVM) Setup](#cardano-non-evm-setup)
   - [Nix Environment Setup](#nix-environment-setup)
   - [Aiken Framework Installation](#aiken-framework-installation)
@@ -28,6 +33,90 @@ This project enables developers to:
 - **EVM**: Implement cross-chain swaps using 1inch's Cross-Chain Resolver, Limit Order Protocol, and Cross-Chain Swap SDK, enabling seamless function calls across EVM-compatible chains.
 
 The goal is to provide a streamlined developer experience for cross-chain atomic swaps, combining Cardano's eUTXO model with EVM's account-based model.
+
+## Cardano Fusion Extension
+
+The `cardano-fusion-extension` directory contains the core implementation of cross-chain atomic swaps using Aiken smart contracts. This module provides sophisticated HTLC (Hash Time Lock Contract) functionality with partial fill support and safety mechanisms.
+
+### Aiken Validators (.ak files)
+
+The project includes four main validators written in Aiken:
+
+#### 1. Source Validator (`source.ak`)
+- **Lines of Code**: 158 lines
+- **Purpose**: Manages the source chain side of cross-chain swaps
+- **Key Features**:
+  - Supports maker-initiated swaps with secret hash verification
+  - Implements `withdrawTo()` functionality for directing funds to specific addresses
+  - Includes safety deposit mechanisms for dispute resolution
+  - Provides public withdraw/cancel functions for emergency situations
+
+#### 2. Destination Validator (`destination.ak`)
+- **Lines of Code**: 144 lines  
+- **Purpose**: Handles the destination chain side of cross-chain swaps
+- **Key Features**:
+  - Taker-side swap completion with secret revelation
+  - Time-locked cancellation mechanisms
+  - Safety deposit claim/refund functionality
+  - Public access functions for decentralized dispute resolution
+
+#### 3. Legacy Validators
+- `sourceOG.ak` and `destinationOG.ak` provide the original implementation patterns
+- These serve as reference implementations and fallback options
+
+### Partial Fills Implementation
+
+The project features an advanced partial fills system located in `partial_fills/contracts/`:
+
+#### Merkle Tree-Based Order Management (`partial_fill_merkle.ak`)
+- **Lines of Code**: 529 lines
+- **Purpose**: Implements sophisticated order book functionality with Merkle tree verification
+- **Key Components**:
+  - **Order Structure**: Comprehensive order data including maker/taker assets, amounts, and fill tracking
+  - **Fill Records**: Detailed execution tracking with timestamps and partial fill flags
+  - **Merkle Proofs**: Efficient batch validation of multiple orders and fills
+  - **Minimum Fill Amounts**: Prevents dust attacks and ensures economic viability
+
+#### Features:
+- **Batch Processing**: Validate multiple partial fills in a single transaction
+- **Order Tracking**: Maintains filled amounts and remaining quantities
+- **Proof Verification**: Uses Merkle trees for efficient order validation
+- **Safety Mechanisms**: Minimum fill amounts and expiry times
+
+### HTLC Cross-Chain Implementation
+
+The HTLC implementation provides secure cross-chain atomic swaps with the following architecture:
+
+#### Core HTLC Features:
+1. **Secret Hash Verification**: Uses Keccak-256 hashing for cross-chain compatibility
+2. **Time Locks**: Configurable expiry times for both swap initiation and completion
+3. **Dual-Chain Safety**: Source and destination validators work in tandem
+4. **Safety Deposits**: Additional collateral mechanism for dispute resolution
+
+#### Swap Flow:
+1. **Initiation**: Maker locks funds on source chain with secret hash
+2. **Response**: Taker locks funds on destination chain with same secret hash
+3. **Completion**: Either party can complete by revealing the secret
+4. **Timeout**: Funds can be reclaimed after expiry if swap incomplete
+
+#### Safety Mechanisms:
+- **Resolver System**: Third-party dispute resolution with safety deposits
+- **Public Functions**: Community-driven emergency recovery options
+- **Time-Based Refunds**: Automatic fund recovery after expiration
+
+### Lines of Code Statistics
+
+**Cardano Fusion Extension Total**: ~831 lines of Aiken code
+- `source.ak`: 158 lines
+- `destination.ak`: 144 lines
+- `partial_fill_merkle.ak`: 529 lines
+
+**Project Structure**:
+- 4 main validator contracts
+- 2 Aiken projects (main + partial fills)
+- Generated Plutus scripts for on-chain deployment
+- Address generation for both testnet and mainnet
+- Comprehensive cross-chain swap infrastructure
 
 ## Prerequisites
 - **Cardano (Non-EVM)**:
