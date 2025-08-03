@@ -19,6 +19,8 @@ export const htlcScript = {
  * - boolean -> Plutus Bool (constructor 1 or 0)
  */
 export function toData(value: string | number | bigint | boolean): Data {
+  
+  
   if (typeof value === "string") {
     const hex = value.startsWith("0x")
       ? value.slice(2)

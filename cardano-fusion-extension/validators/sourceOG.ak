@@ -8,8 +8,7 @@ use cardano/address.{Address}
 pub type SwapDatum {
   maker: ByteArray,              // Maker's public key hash
   taker: ByteArray,              // Taker's public key hash  
-  maker_secret_hash: ByteArray,   // Hash of maker's secret (keccak_256)
-  taker_secret_hash: ByteArray,   // Hash of taker's secret (keccak_256)
+  secret_hash: ByteArray,   // Hash of maker's secret (keccak_256)
   amount: Int,                   // Amount to swap
   expiry_time: Int,              // When swap expires
   is_active: Bool,               // Whether swap is still active
@@ -46,8 +45,7 @@ validator source_swap {
     expect Some(SwapDatum { 
       maker, 
       taker, 
-      maker_secret_hash, 
-      taker_secret_hash, 
+      secret_hash, 
       amount, 
       expiry_time, 
       is_active 
@@ -65,16 +63,18 @@ validator source_swap {
     when redeemer is {
       // withdraw() - Maker withdraws by providing their secret
       WithdrawAction { secret } -> {
-        let valid_maker_secret = keccak_256(secret) == maker_secret_hash
+        let valid_maker_secret = keccak_256(secret) == secret_hash
         let signed_by_maker = list.has(tx.extra_signatories, maker)
         let not_expired = !is_expired
-        
+
+        trace @"WithdrawAction": string.from_bytearray(secret)
+
         valid_maker_secret && signed_by_maker && not_expired
       }
 
       // withdrawTo() - Maker withdraws to specific address with secret
       WithdrawToAction { secret, to } -> {
-        let valid_maker_secret = keccak_256(secret) == maker_secret_hash
+        let valid_maker_secret = keccak_256(secret) == secret_hash
         let signed_by_maker = list.has(tx.extra_signatories, maker)
         let not_expired = !is_expired
         
@@ -93,8 +93,7 @@ validator source_swap {
 
       // publicWithdraw() - Anyone can withdraw with correct secret
       PublicWithdrawAction { secret } -> {
-        let valid_secret = keccak_256(secret) == maker_secret_hash || 
-                          keccak_256(secret) == taker_secret_hash
+        let valid_secret = keccak_256(secret) == secret_hash
         let not_expired = !is_expired
         
         valid_secret && not_expired
