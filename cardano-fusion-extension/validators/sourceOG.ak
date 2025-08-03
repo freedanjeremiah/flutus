@@ -8,7 +8,7 @@ use cardano/address.{Address}
 pub type SwapDatum {
   maker: ByteArray,              // Maker's public key hash
   taker: ByteArray,              // Taker's public key hash  
-  secret_hash: ByteArray,   // Hash of maker's secret (keccak_256)
+  secret_hash: ByteArray,        // Hash of the secret (keccak_256)
   amount: Int,                   // Amount to swap
   expiry_time: Int,              // When swap expires
   is_active: Bool,               // Whether swap is still active
@@ -63,25 +63,23 @@ validator source_swap {
     when redeemer is {
       // withdraw() - Maker withdraws by providing their secret
       WithdrawAction { secret } -> {
-        let valid_maker_secret = keccak_256(secret) == secret_hash
+        let valid_maker_secret = keccak_256(secret) == maker_secret_hash
         let signed_by_maker = list.has(tx.extra_signatories, maker)
         let not_expired = !is_expired
-
-        trace @"WithdrawAction": string.from_bytearray(secret)
-
+        
         valid_maker_secret && signed_by_maker && not_expired
       }
 
       // withdrawTo() - Maker withdraws to specific address with secret
       WithdrawToAction { secret, to } -> {
-        let valid_maker_secret = keccak_256(secret) == secret_hash
+        let valid_maker_secret = keccak_256(secret) == maker_secret_hash
         let signed_by_maker = list.has(tx.extra_signatories, maker)
         let not_expired = !is_expired
         
         // Simple check - in real implementation would verify outputs
         let funds_to_address = True  // Simplified for now
         
-        valid_maker_secret && signed_by_maker && not_expired && funds_to_address
+        valid_secret && signed_by_maker && not_expired && funds_to_address
       }
 
       // cancel() - Maker cancels after expiry
