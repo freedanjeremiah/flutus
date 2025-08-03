@@ -63,16 +63,16 @@ validator source_swap {
     when redeemer is {
       // withdraw() - Maker withdraws by providing their secret
       WithdrawAction { secret } -> {
-        let valid_maker_secret = keccak_256(secret) == maker_secret_hash
+        let valid_secret = keccak_256(secret) == secret_hash
         let signed_by_maker = list.has(tx.extra_signatories, maker)
         let not_expired = !is_expired
         
-        valid_maker_secret && signed_by_maker && not_expired
+        valid_secret && signed_by_maker && not_expired
       }
 
       // withdrawTo() - Maker withdraws to specific address with secret
       WithdrawToAction { secret, to } -> {
-        let valid_maker_secret = keccak_256(secret) == maker_secret_hash
+        let valid_secret = keccak_256(secret) == secret_hash
         let signed_by_maker = list.has(tx.extra_signatories, maker)
         let not_expired = !is_expired
         
